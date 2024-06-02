@@ -1,7 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/db/entities/User';
@@ -27,6 +31,19 @@ export class AuthService {
 
     const hashPass = await hash(password, this.saltOrRounds);
     const user = await this.userRepository.save(new User(email, hashPass));
+    return await this.getToken(user.id, user.email);
+  }
+
+  public async signin(
+    email: string,
+    password: string,
+  ): Promise<SigninResponseDTO> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) throw new UnauthorizedException('Email or password incorrect!');
+    const passwordMatches = compare(password, user.password);
+    if (!passwordMatches)
+      throw new UnauthorizedException('Email or password incorrect!');
+
     return await this.getToken(user.id, user.email);
   }
 

@@ -3,8 +3,10 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignupRequestDTO } from './dto/request/signup.dto';
@@ -33,5 +35,25 @@ export class AuthController {
   @Post('/signup')
   async signup(@Body() body: SignupRequestDTO): Promise<SigninResponseDTO> {
     return await this.service.signup(body.email, body.password);
+  }
+
+  @ApiOperation({
+    summary: 'Endpoint for users to sign in',
+  })
+  @ApiOkResponse({
+    description:
+      '200 status code means credentials are correct and access token is returned!',
+    type: SigninResponseDTO,
+  })
+  @ApiBadRequestResponse({
+    description:
+      '400 status code means email or password are not in correct format!',
+  })
+  @ApiUnauthorizedResponse({
+    description: '401 status code means email or password is incorrect!',
+  })
+  @Post('/signin')
+  async signin(@Body() body: SignupRequestDTO): Promise<SigninResponseDTO> {
+    return await this.service.signin(body.email, body.password);
   }
 }
