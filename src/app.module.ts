@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import ormConfig from './config/orm.config';
+import { TodoModule } from './todo/todo.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import ormConfig from './config/orm.config';
         configService.get('ormConfig'),
     }),
     AuthModule,
+    TodoModule,
   ],
 })
 export class AppModule {}
